@@ -1,0 +1,74 @@
+
+import org.redisson.Redisson;
+import org.redisson.api.RKeys;
+import org.redisson.api.RScript;
+import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.StringCodec;
+import org.redisson.config.Config;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+public class LuaTest {
+
+    private static final String LUA_SCRIPT = "local cursor = \"0\"\n" +
+            "local keys = {}\n" +
+            "local count = 0\n" +
+            "\n" +
+            "repeat\n" +
+            "    local result = redis.call('SCAN', cursor, 'MATCH', ARGV[1], 'COUNT', 1000)\n" +
+            "    cursor = result[1]\n" +
+            "    local ks = result[2]\n" +
+            "    for i=1,#ks do\n" +
+            "        table.insert(keys, ks[i])\n" +
+            "    end\n" +
+            "    if #keys >= 5000 then\n" +
+            "        redis.call('DEL', unpack(keys))\n" +
+            "        count = count + #keys\n" +
+            "        keys = {}\n" +
+            "    end\n" +
+            "until cursor == \"0\"\n" +
+            "\n" +
+            "if #keys > 0 then\n" +
+            "    redis.call('DEL', unpack(keys))\n" +
+            "    count = count + #keys\n" +
+            "end\n" +
+            "\n" +
+            "return count";
+
+    public static void main(String[] args) {
+
+        Config config = new Config();
+        config.useSingleServer()
+                .setAddress("redis://127.0.0.1:6379");
+
+        RedissonClient redisson = null;
+        try {
+            redisson = Redisson.create(config);
+
+            String pattern = "tdm*";
+//            Iterable<String> keys = redisson.getKeys().getKeysByPattern(pattern);
+//            for (String key : keys) {
+//                System.out.println("Found key: " + key);
+//            }
+            RScript script = redisson.getScript(StringCodec.INSTANCE);
+
+            Long keysDeleted = script.eval(
+                    RScript.Mode.READ_WRITE,
+                    LUA_SCRIPT,
+                    RScript.ReturnType.INTEGER,
+                    Collections.emptyList(),
+                    pattern
+            );
+
+            System.out.println("Deleted keys count: " + keysDeleted);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (redisson != null) {
+                redisson.shutdown();
+            }
+        }
+    }
+}
