@@ -283,10 +283,10 @@ if __name__ == '__main__':
     ranking_list_resp_dto = RankingListRespDTO(0, '202406', '12345678', 1,'test', 'https://www.baidu.com', 123213, 1, datetime.datetime.now())
 
 
-    insert_object_to_redis(acceleration_trend_resp_dto, "tdm_roe_acceleration_trend_", client)
-    insert_object_to_redis(charging_performance_resp_dto, "tdm_roe_charging_performance_", client)
-    insert_object_to_redis(distribution_of_charging_capacity_resp_dto, "tdm_roe_distribution_of_charging_capacity_", client)
-    insert_object_to_redis(driving_performance_resp_dto, "tdm_roe_driving_performance_", client)
-    insert_object_to_redis(energy_consumption_resp_dto, "tdm_roe_energy_consumption_", client)
-    insert_object_to_redis(energy_consumption_trend_resp_dto, "tdm_roe_energy_consumption_trend_", client)
-    insert_object_to_redis(ranking_list_resp_dto, "tdm_roe_ranking_list_trend_", client)
+    insert_object_to_redis(acceleration_trend_resp_dto, "tmd_acceleration_trend_", client)
+    insert_object_to_redis(charging_performance_resp_dto, "tmd_charging_performance_", client)
+    insert_object_to_redis(distribution_of_charging_capacity_resp_dto, "tmd_distribution_of_charging_capacity_", client)
+    insert_object_to_redis(driving_performance_resp_dto, "tmd_driving_performance_", client)
+    insert_object_to_redis(energy_consumption_resp_dto, "tmd_energy_consumption_", client)
+    insert_object_to_redis(energy_consumption_trend_resp_dto, "tmd_energy_consumption_trend_", client)
+    insert_object_to_redis(ranking_list_resp_dto, "tmd_ranking_list_trend_", client)
